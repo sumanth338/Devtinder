@@ -3,10 +3,14 @@ const userAuth = require("./middleware/auth")
 
 const app = express()
 
-app.get('/user',userAuth, (req,res, next)=>{
-	console.log("Handling the route user")
-	// res.send("first response");
-	next();
+app.get('/user', (req,res, next)=>{
+	try{
+		throw new Error('something went wrong')
+		res.send("first response");
+	}
+	catch(err){
+		res.status(500).send('Internal server error')
+	}
 },
 (req,res,next)=>{
 	console.log("Handling the route user")
