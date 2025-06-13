@@ -1,29 +1,36 @@
 const express = require("express")
 const userAuth = require("./middleware/auth")
+const connectDB = require("./config/database")
+const User = require("./model/user")
 
 const app = express()
 
-app.get('/user', (req,res, next)=>{
-	try{
-		throw new Error('something went wrong')
-		res.send("first response");
+app.post("/signup", async(req, res)=>{
+	const user = new User({
+		firstName: "sumanth",
+		lastName: "katta",
+		email: "sumanth@gmail.com",
+		password: "123456",
+	})
+	try{	
+		await user.save()
+		res.send("user created successfully")
+	}catch(err){
+		res.status(500).send('Error saving user')
 	}
-	catch(err){
-		res.status(500).send('Internal server error')
-	}
-},
-(req,res,next)=>{
-	console.log("Handling the route user")
-	// res.send("second response");
-	next();
-},
-(req,res,next)=>{
-	console.log("Handling the route user")
-	res.send("third response");
 })
 
-app.listen(3000,()=>{
-	console.log('server is running on port 3000')
+
+
+connectDB().then(()=>{
+    console.log("Connected to MongoDB")
+	app.listen(3000,()=>{
+		console.log('server is running on port 3000')
+	})
+}).catch((err)=>{
+    console.log("Error connecting to MongoDB")
 })
+
+
 
 
