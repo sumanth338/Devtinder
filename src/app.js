@@ -5,18 +5,31 @@ const User = require("./model/user")
 
 const app = express()
 
+app.use(express.json())
+
+// add user
 app.post("/signup", async(req, res)=>{
-	const user = new User({
-		firstName: "sumanth",
-		lastName: "katta",
-		email: "sumanth@gmail.com",
-		password: "123456",
-	})
+	const user = new User(req.body)
 	try{	
 		await user.save()
 		res.send("user created successfully")
 	}catch(err){
 		res.status(500).send('Error saving user')
+	}
+})
+
+// Get user by emailid
+app.get('/user',async(req, res)=>{
+	const userEmail = req.body.email
+	try{
+		const users = await User.find({email:userEmail})
+		if(users.length === 0){
+			res.send("User not found")
+		}else{
+			res.send(users)
+		}
+	}catch(err){
+		res.status(400).send('Error fetching user')
 	}
 })
 
