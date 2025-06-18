@@ -33,7 +33,16 @@ app.get('/user',async(req, res)=>{
 	}
 })
 
-
+// Delete user by id
+app.delete('/user', async(req, res)=>{
+	const userId = req.body.userId
+	try{
+		const user = await User.findByIdAndDelete(userId)
+		res.send('User deleted successfully')
+	}catch(err){
+		res.status(400).send('Error deleting user')
+	}
+})
 
 connectDB().then(()=>{
     console.log("Connected to MongoDB")
