@@ -44,6 +44,18 @@ app.delete('/user', async(req, res)=>{
 	}
 })
 
+// Update user by id
+app.patch('/user', async(req, res)=>{
+	const userId = req.body.userId
+	const data = req.body
+	try{
+		const user = await User.findByIdAndUpdate({_id:userId}, data)
+		res.send('User updated successfully')
+	}catch(err){
+		res.status(400).send('Error updating user')
+	}
+})
+
 connectDB().then(()=>{
     console.log("Connected to MongoDB")
 	app.listen(3000,()=>{
