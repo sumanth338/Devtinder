@@ -2,6 +2,8 @@ const express = require("express")
 const userAuth = require("./middleware/auth")
 const connectDB = require("./config/database")
 const User = require("./model/user")
+const {validateSignupData} = require("./utils/validation")
+const bcrypt = require("bcrypt")
 
 const app = express()
 
@@ -9,12 +11,18 @@ app.use(express.json())
 
 // add user
 app.post("/signup", async(req, res)=>{
-	const user = new User(req.body)
+	
 	try{	
+		validateSignupData(req)
+
+		const {firstName, lastName, email, password} = req.body
+
+		const hashedPassword = await bcrypt.hash(password, 10)
+		const user = new User({firstName, lastName, email, password:hashedPassword})
 		await user.save()
 		res.send("user created successfully")
 	}catch(err){
-		res.status(500).send('Error saving user')
+		res.status(500).send('Error:'+ err.message)
 	}
 })
 
