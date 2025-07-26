@@ -2,7 +2,8 @@ const express = require('express')
 const User = require('../model/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { validateSignupData } = require('../utils/validation')
+const { validateSignupData, validateEditProfileData } = require('../utils/validation')
+const userAuth = require('../middleware/auth')
 
 const authRouter = express.Router()
 
@@ -51,4 +52,39 @@ authRouter.post("/login", async(req, res)=>{
 })
 
 
+//logout
+authRouter.post("/logout", async(req, res)=>{
+	// try{
+	// 	res.clearCookie("token")
+	// 	res.send("logout successful")
+	// }
+	// catch(err){
+	// 	res.status(500).send('Error:'+ err.message)
+	// }
+	res.cookie("token", null,{
+		expires: new Date(Date.now()),
+	})
+	res.send("logout successful")
+})
+
+//profile update
+authRouter.patch("/profile/edit",userAuth, async(req, res)=>{
+	try{
+		const isEditAllowed = validateEditProfileData(req)
+		if(!isEditAllowed){
+			throw new Error('Invalid fields')
+		}
+		else{
+			res.send("profile updated successfully")
+		}
+	}
+	catch(err){
+			res.status(500).send('Error:'+ err.message)
+		}
+		const loggedInUser = req.user
+		console.log(loggedInUser)
+		const {firstName, lastName, email, photoUrl, gender, age, about, skills} = req.body
+		const updatedUser = await User.findByIdAndUpdate(loggedInUser._id, {firstName, lastName, email, photoUrl, gender, age, about, skills}, {new:true})
+		res.send(updatedUser)
+})
 module.exports = authRouter
