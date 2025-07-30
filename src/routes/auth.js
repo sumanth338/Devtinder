@@ -87,4 +87,19 @@ authRouter.patch("/profile/edit",userAuth, async(req, res)=>{
 		const updatedUser = await User.findByIdAndUpdate(loggedInUser._id, {firstName, lastName, email, photoUrl, gender, age, about, skills}, {new:true})
 		res.send(updatedUser)
 })
+
+//forgot password
+authRouter.post("/forgot-password", async(req, res)=>{
+	try{
+		const {email} = req.body
+		const user = await User.findOne({email:email})
+		if(!user){
+			return res.status(400).send("email id is not present in the database")
+		}
+		const token = await jwt.sign({_id:user._id},"secretkey777",{expiresIn:"1h"})
+	}
+	catch(err){
+		res.status(500).send('Error:'+ err.message)
+	}
+})
 module.exports = authRouter
