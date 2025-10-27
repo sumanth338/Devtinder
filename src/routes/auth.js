@@ -40,7 +40,8 @@ authRouter.post("/login", async(req, res)=>{
 			const token = await jwt.sign({_id:user._id},"secretkey777",{expiresIn:"1h"})
 			res.cookie("token",token)
 
-			res.send('login successful')
+			// res.send('login successful')
+			res.send(user)
 		}
 		else{
 			res.status(400).send("password is incorrect")

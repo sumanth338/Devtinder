@@ -2,8 +2,9 @@ const express = require("express")
 
 const requestRouter = express.Router()
 const userAuth = require("../middleware/auth")
-const ConnectionRequest = require("../model/ConnectionRequest")
+const ConnectionRequest = require("../model/connectionRequest")
 const User = require("../model/user")
+
 
 //practice
 requestRouter.post('/request/send/:status/:toUserId',userAuth, async(req, res)=>{
