@@ -11,7 +11,7 @@ userRouter.get("/user/requests/received",userAuth, async(req,res)=>{
         const loggedInUser = req.user;
 
         const connectionRequests = await ConnectionRequest.
-        find({toUserId:loggedInUser._id,status:"interested"}).populate("fromUserId",["firstName","lastName"]);
+        find({toUserId:loggedInUser._id,status:"interested"}).populate("fromUserId",["firstName","lastName","photoUrl","about"]);
         res.json({
             message:"Data fetched successfully",
             data:connectionRequests
@@ -27,10 +27,25 @@ userRouter.get("/user/connections",userAuth, async(req, res)=>{
         //sumanth=>Dhoni=>accepted
         //Dhoni=>elon=>accepted
         const loggedInUser = req.user;
-        const connections = await ConnectionRequest.find({$or:[{fromUserId:loggedInUser._id,status:"accepted"},{toUserId:loggedInUser._id,status:"accepted"}]}).populate("fromUserId",["firstName","lastName"]).populate("toUserId",["firstName","lastName"]);
+        const connections = await ConnectionRequest.find({
+            $or:[
+                {fromUserId:loggedInUser._id,status:"accepted"},
+                {toUserId:loggedInUser._id,status:"accepted"}
+            ]
+        }).populate("fromUserId").populate("toUserId");
+        
+        // Extract only the other user's details (not the logged-in user)
+        const connectionsData = connections.map(connection => {
+            if(connection.fromUserId._id.toString() === loggedInUser._id.toString()){
+                return connection.toUserId;
+            } else {
+                return connection.fromUserId;
+            }
+        });
+        
         res.json({
             message:"Data fetched successfully",
-            data:connections
+            data:connectionsData
         })
     }
     catch(err){
